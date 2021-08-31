@@ -1,8 +1,9 @@
 import { render, screen } from '@testing-library/react';
-import App from './App';
+import ConversorMoedas from './conversor-moedas';
+
 
 test('renders learn react link', () => {
-  render(<App />);
+  render(<ConversorMoedas />);
   const linkElement = screen.getByText(/learn react/i);
   expect(linkElement).toBeInTheDocument();
 });
