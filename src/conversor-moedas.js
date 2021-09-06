@@ -17,6 +17,7 @@ function ConversorMoedas() {
   const [formValidado, setFormValidado] = useState(false);
   const [exibirModal, setExibirModal] = useState(false);
   const [resultadoConversao, setResultadoConversao] = useState('');
+  const [exibirMsgErro, setExibirMsgErro] = useState(false);
 
   function handleValor(event) {
     setValor(event.target.value.replace(/\D/g, ''));
@@ -47,10 +48,15 @@ function ConversorMoedas() {
       axios.get(FIXER_URL)
       .then(res => {
         const cotacao = obterCotacao(res.data);
+        if(cotacao) {
         setResultadoConversao(`${valor} ${moedaDe} = ${cotacao} ${moedaPara}`);
         setExibirModal(true);
         setExibirSpinner(false);
-      })
+        setExibirMsgErro(false);
+      } else {
+        exibirErro();
+      }
+      }).catch(err => exibirErro());
     } 
   };
 
@@ -64,10 +70,15 @@ function ConversorMoedas() {
       return cotacao.toFixed(2);
     }
 
+    function exibirErro() {
+      setExibirMsgErro(true);
+      setExibirSpinner(false);
+    }
+
   return (
    <div> 
      <h1>Conversor de Moedas</h1>
-     <Alert variant='danger' show={false}>Erro ao obter dados de conversão, tente novamente.</Alert>
+     <Alert variant='danger' show={exibirMsgErro}>Erro ao obter dados de conversão, tente novamente.</Alert>
    
       <div className='p-5 mb-4 bg-light border rounded-3'>
         <Form onSubmit={converter} noValidate validated={formValidado}>
@@ -89,7 +100,7 @@ function ConversorMoedas() {
               </Form.Control>
             </Col>
             <Col sm='2'>
-              <Button variant='success' type='submit'>
+              <Button variant='success' type='submit' data-testid = 'btn-converter'>
                 <span className={exibirSpinner ? null : 'hidden'}>
                 <Spinner animation='border' size='sm'></Spinner>
                 </span>
@@ -100,7 +111,7 @@ function ConversorMoedas() {
             </Col>
           </Row>
         </Form>
-        <Modal show={exibirModal}>
+        <Modal show={exibirModal} data-testid = 'modal'>
           <Modal.Header>
           <Modal.Title>
             Conversão
